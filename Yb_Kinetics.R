@@ -1,4 +1,38 @@
+
 library(tidyverse)
+
+# Initial HTE Evaluation of Lewis Acids -----------------------------------
+
+HTE_Data <- read_csv("HTE.csv")
+
+HTE_Data <- HTE_Data %>% rename(`Lewis Acid` = LewisAcid) %>% filter(Entry != "67")
+
+HTE_Data$Product[HTE_Data$Product == "Product 1"] <- 6
+HTE_Data$Product[HTE_Data$Product == "Product 2"] <- 7
+HTE_Data$Product[HTE_Data$Product == "Product 3"] <- 8
+
+HTE_Plot <- ggplot(HTE_Data, aes(reorder(`Lewis Acid`, `AP PDT`,
+                                         FUN = median),
+                                 `AP PDT`))+
+  geom_boxplot()+
+  coord_flip()+
+  geom_point(aes(color = Product, shape = `Solvent`), size = 4)+
+  labs(x = "Lewis Acid", y = "Area Percent Ester Product")+
+  theme(plot.background = element_rect(fill="white"))+
+  theme(panel.background = element_rect(fill="white", colour="grey50"))+
+  theme(plot.title = element_text(face = "bold", 
+                                  size = 18,
+                                  color="Navy"))+
+  theme(axis.title = element_text(face = "bold", size = 16))+
+  theme(axis.text.x = element_text(vjust = 1,
+                                   hjust = 1,
+                                   size = 12,
+                                   angle = 60))+
+  theme(axis.text.y = element_text(size = 12))
+
+HTE_Plot
+
+# Ionic Radius Models and Plots -------------------------------------------
 
 Data <- read.csv("Yb_Kinetics.csv")
 
@@ -191,3 +225,38 @@ Ionic_Radius_Plot_1 <- ggplot(Data_1, aes(log_Ionic_Radius, log_Time_to_Completi
   theme(axis.text.y = element_text(size = 12))
 
 Ionic_Radius_Plot_1
+
+
+# Kinetic Isotope Effect --------------------------------------------------
+
+library(readxl)
+
+KIE_Data <- read_xlsx("Yb_KIE.xlsx", sheet = "Sheet1")
+
+KIE_Data <- KIE_Data %>% filter(Time_h <3)
+
+KIE_Data <- KIE_Data %>% rename(`Product (S)-6` = Product_3) %>%
+  rename(`Product 23` = Product_25)
+
+KIE_Plot <- ggplot(KIE_Data, aes())+
+  geom_point(aes(x = Time_h, y = `Product (S)-6`, color = "Product (S)-6"), size = 2)+
+  geom_smooth(aes(x = Time_h, y = `Product (S)-6`), method = "lm", color = "red")+
+  geom_point(aes(x = Time_h, y = `Product 23`, color = "Product 23"), size = 2)+
+  geom_smooth(aes(x = Time_h, y = `Product 23`), method = "lm", color = "blue")+
+  scale_colour_manual(name="legend", values=c("red", "blue"))+
+  ggtitle("Reaction Progress for Methanol\nvs Methanol-d4")+
+  labs(x = "Time (h)", y = "Area Percent Product")+
+  theme(plot.background = element_rect(fill="white"))+
+  theme(panel.background = element_rect(fill="white", colour="grey50"))+
+  theme(plot.title = element_text(face = "bold", 
+                                  size = 18,
+                                  color="Navy"))+
+  theme(axis.title = element_text(face = "bold", size = 16))+
+  theme(axis.text.x = element_text(vjust = 1,
+                                   hjust = 1,
+                                   size=12))+
+  theme(axis.text.y = element_text(size=12))
+
+KIE_Plot
+
+sessionInfo()
